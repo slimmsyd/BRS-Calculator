@@ -235,7 +235,7 @@ export default function LandingPage() {
             </h2>
             <input
               type="date"
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+              className="w-full px-4 py-3 text-black border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
               onChange={(e) => {
                 setResponses(prev => ({ ...prev, entryDate: new Date(e.target.value) }));
               }}
