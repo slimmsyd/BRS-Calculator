@@ -184,7 +184,7 @@ export default function LandingPage() {
             animate="animate"
             exit="exit"
             transition={pageTransition}
-            className="w-full max-w-3xl "
+            className="w-full max-w-3xl"
           >
             {(currentStep as string) !== 'intro' && (
               <button
@@ -252,7 +252,14 @@ export default function LandingPage() {
 
       case 'rank':
         return (
-          <motion.div className="w-full max-w-xl">
+          <motion.div
+            className="w-full max-w-xl transition-all duration-500 ease-in-out transform"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+          >
             <h2 className="text-2xl font-semibold text-center mb-8 text-black">
               What is your rank/pay grade?
             </h2>
@@ -276,7 +283,14 @@ export default function LandingPage() {
 
       case 'retirement-system':
         return (
-          <motion.div className="w-full max-w-xl">
+          <motion.div
+            className="w-full max-w-xl transition-all duration-500 ease-in-out transform"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+          >
             <h2 className="text-2xl font-semibold text-center mb-8 text-black">
               Select your retirement system
             </h2>
@@ -304,7 +318,14 @@ export default function LandingPage() {
 
       case 'service-years':
         return (
-          <motion.div className="w-full max-w-xl">
+          <motion.div
+            className="w-full max-w-xl transition-all duration-500 ease-in-out transform"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+          >
             <h2 className="text-2xl font-semibold text-center mb-8 text-black">
               Years of Service
             </h2>
@@ -394,7 +415,14 @@ export default function LandingPage() {
 
       case 'tsp':
         return (
-          <motion.div className="w-full max-w-xl">
+          <motion.div
+            className="w-full max-w-xl transition-all duration-500 ease-in-out transform"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+          >
             <h2 className="text-2xl font-semibold text-center mb-8 text-black">
               Thrift Savings Plan (TSP)
             </h2>
@@ -430,7 +458,14 @@ export default function LandingPage() {
 
       case 'lump-sum':
         return (
-          <motion.div className="w-full max-w-xl">
+          <motion.div
+            className="w-full max-w-xl transition-all duration-500 ease-in-out transform"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={pageTransition}
+          >
             <h2 className="text-2xl font-semibold text-center mb-8 text-black">
               Lump Sum Option
             </h2>
@@ -490,12 +525,12 @@ export default function LandingPage() {
         return (
           <motion.div
             key="summary"
+            className="w-full max-w-xl bg-white p-6 rounded-lg shadow-lg transition-all duration-500 ease-in-out transform"
             variants={pageVariants}
             initial="initial"
             animate="animate"
             exit="exit"
             transition={pageTransition}
-            className="w-full max-w-xl bg-white p-6 rounded-lg shadow-lg"
           >
             <h2 className="text-2xl font-semibold mb-6 text-black">Your Retirement Summary</h2>
             
