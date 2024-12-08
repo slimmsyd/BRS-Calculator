@@ -28,6 +28,16 @@ const pageTransition = {
   duration: 0.5
 };
 
+// Add this near the top with other constants
+const branchSeals = [
+  { name: 'Airforce', image: '/sealAirForce.png' },
+  { name: 'Army', image: '/sealArmy.png' },
+  { name: 'Marines', image: '/sealMarineCorps.png' },
+  { name: 'Navy', image: '/sealNavy.png' },
+  { name: 'Coast Guard', image: '/sealCoastGuard.png' },
+  { name: 'Space Force', image: '/SealSpaceForce.png' }
+];
+
 export default function LandingPage() {
   const [currentStep, setCurrentStep] = useState<Step>('intro');
   const [responses, setResponses] = useState<UserResponses>(initialUserResponses);
@@ -194,17 +204,22 @@ export default function LandingPage() {
                 <span>←</span> Back
               </button>
             )}
-            <h2 className="text-2xl font-semibold text-center mb-8">
-              Your Branch Of Service
+            <h2 className="text-2xl font-semibold text-center text-black mb-8">
+              Select Your Branch Of Service
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4 md:gap-6 text-black">
-              {branches.map((branch) => (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4 md:gap-6">
+              {branchSeals.map((branch) => (
                 <div
-                  key={branch}
-                  onClick={() => handleBranchSelect(branch as MilitaryBranch)}
-                  className="aspect-[3/4] bg-white rounded-xl shadow-lg p-4 flex items-center justify-center hover:shadow-xl transition-shadow cursor-pointer border text-center"
+                  key={branch.name}
+                  onClick={() => handleBranchSelect(branch.name as MilitaryBranch)}
+                  className="aspect-square bg-white rounded-xl shadow-lg p-4 flex flex-col items-center justify-center hover:shadow-xl transition-all cursor-pointer border hover:scale-105"
                 >
-                  <span className="text-base md:text-lg">{branch}</span>
+                  <img
+                    src={branch.image}
+                    alt={`${branch.name} Seal`}
+                    className="w-full h-full object-contain"
+                  />
+                  <span className="mt-2 text-sm font-medium text-gray-800">{branch.name}</span>
                 </div>
               ))}
             </div>
@@ -647,25 +662,39 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      {/* Header */}
-      <header className="flex justify-between items-center p-4 border-b">
-        <h1 className="text-2xl font-bold text-black">Retirement Calculator</h1>
+    <div className="min-h-screen flex flex-col bg-white relative">
+      {/* Add background image */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: "url('/UnitedStates.jpeg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.35  // Adjust this value to make the background more/less visible
+        }}
+      />
+
+      {/* Header - add z-10 to ensure it's above the background */}
+      <header className="flex justify-between items-center p-4 relative z-10 bg-black">
+        <button 
+        onClick={() => setCurrentStep('intro')}
+        className="text-2xl font-bold text-white cursor-pointer">Retirement Calculator</button>
         <div className="space-x-4">
           <button
             onClick={() => setShowLogin(true)}
-            className="px-4 py-2 text-black hover:text-gray-600"
+            className="px-4 py-2 text-white hover:text-gray-600"
           >
             Log In
           </button>
-          <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+          <button className="px-4 py-2 bg-transparent text-white rounded-lg border border-white">
             Sign Up
           </button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center flex-col py-12 px-4">
+      {/* Main Content - add z-10 to ensure it's above the background */}
+      <div className="flex-1 flex items-center justify-center flex-col py-12 px-4 relative z-10">
         <h1 className="text-4xl font-bold mb-4 text-black text-center">
           Simplify Your Military Retirement Planning
         </h1>
