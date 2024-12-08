@@ -38,6 +38,7 @@ export default function LandingPage() {
     percentageOfBasePay: string;
     lumpSum?: number;
   } | null>(null);
+  const [showLogin, setShowLogin] = useState(false);
 
   const branches = ['Airforce', 'Army', 'Marines', 'Navy', 'Coast Guard', 'Space Force'];
   const ranks = [
@@ -46,7 +47,8 @@ export default function LandingPage() {
     'W-1', 'W-2', 'W-3', 'W-4', 'W-5'
   ];
 
-  const retirementSystems: RetirementSystem[] = ['Final Pay', 'High-3', 'BRS'];
+  //Final Pay, High-3, BRS
+  const retirementSystems: RetirementSystem[] = [ 'BRS'];
 
   const goBack = () => {
     const stepOrder: Step[] = [
@@ -79,14 +81,14 @@ export default function LandingPage() {
     try {
       console.log('Starting retirement calculation with responses:', responses);
       
-      if (responses.serviceType === 'Active Duty' && responses.yearsOfService) {
+      // Focus on Reserves calculation
+      if (responses.serviceType === 'Reserves' && responses.retirementPoints) {
         const multiplier = 0.02;
-        const yearsServed = responses.yearsOfService;
         const basePay = getRankBasePay(responses.rankPayGrade);
         
         console.log('Calculation parameters:', {
           multiplier,
-          yearsServed,
+          retirementPoints: responses.retirementPoints,
           basePay,
           rankPayGrade: responses.rankPayGrade
         });
@@ -96,7 +98,10 @@ export default function LandingPage() {
           throw new Error('Base pay calculation failed');
         }
 
-        const monthlyRetirement = basePay * multiplier * yearsServed;
+        // Reserve retirement calculation based on points
+        const pointValue = (basePay * multiplier) / 360;  // Each point is worth 1/360th
+        const monthlyRetirement = pointValue * responses.retirementPoints;
+        
         console.log('Calculated monthly retirement:', monthlyRetirement);
         
         let lumpSum: number | undefined;
@@ -111,17 +116,12 @@ export default function LandingPage() {
         const results = {
           monthlyPay: monthlyRetirement,
           yearlyPay: monthlyRetirement * 12,
-          percentageOfBasePay: (multiplier * yearsServed * 100).toFixed(1) + '%',
+          percentageOfBasePay: ((responses.retirementPoints / 360) * multiplier * 100).toFixed(1) + '%',
           lumpSum
         };
         console.log('Setting final calculation results:', results);
 
         setCalculationResults(results);
-      } else {
-        console.warn('Invalid service type or years:', {
-          serviceType: responses.serviceType,
-          yearsOfService: responses.yearsOfService
-        });
       }
     } catch (error) {
       console.error('Calculation failed:', error);
@@ -241,6 +241,7 @@ export default function LandingPage() {
               }}
             />
             <button
+              disabled={!responses.entryDate}
               onClick={() => setCurrentStep('rank')}
               className="w-full px-6 py-3 bg-blue-500 text-white rounded-lg 
                        hover:bg-blue-600 transition-colors"
@@ -335,7 +336,8 @@ export default function LandingPage() {
                   Service Type
                 </label>
                 <div className="grid grid-cols-2 gap-4 text-black">
-                  {['Active Duty', 'Reserves'].map((type) => (
+                  {/* Active Duty */}
+                  {['Reserves'].map((type) => (
                     <button
                       key={type}
                       onClick={() => setResponses(prev => ({ 
@@ -591,7 +593,17 @@ export default function LandingPage() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p>Unable to calculate retirement benefits</p>
+                <p className="text-gray-600 mb-4">Unable to calculate retirement benefits</p>
+                <button
+                  onClick={() => {
+                    setCurrentStep('intro');
+                    setResponses(initialUserResponses);
+                    setCalculationResults(null);
+                  }}
+                  className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Start Over
+                </button>
               </div>
             )}
           </motion.div>
@@ -603,43 +615,116 @@ export default function LandingPage() {
     console.log(responses);
   }, [responses]);
 
+  const LoginModal = () => {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+          <h2 className="text-2xl font-bold mb-4 text-black">Login</h2>
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full mb-4 px-4 py-2 border rounded text-black"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full mb-4 px-4 py-2 border rounded text-black"
+          />
+          <div className="flex justify-between">
+            <button
+              onClick={() => setShowLogin(false)}
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-black"
+            >
+              Cancel
+            </button>
+            <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+              Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white flex-col py-12 px-4">
-      <h1 className="text-4xl font-bold mb-4 text-black text-center">
-        Simplify Your Military Retirement Planning
-      </h1>
-      <p className="text-gray-600 mb-8">
-        Easily calculate your funds in minutes, think ahead.
-      </p>
-      <AnimatePresence mode="wait">
-        {currentStep === 'intro' ? (
-          <motion.div
-            key="intro"
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={pageTransition}
-            className="text-center"
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* Header */}
+      <header className="flex justify-between items-center p-4 border-b">
+        <h1 className="text-2xl font-bold text-black">Retirement Calculator</h1>
+        <div className="space-x-4">
+          <button
+            onClick={() => setShowLogin(true)}
+            className="px-4 py-2 text-black hover:text-gray-600"
           >
-            <div className="flex items-center justify-center gap-4">
-              <input
-                type="text"
-                placeholder="Have your details ready"
-                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <button
-                onClick={() => setCurrentStep('branch-selection')}
-                className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-              >
-                Start
-              </button>
-            </div>
-          </motion.div>
-        ) : (
-          renderStepContent()
-        )}
-      </AnimatePresence>
+            Log In
+          </button>
+          <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+            Sign Up
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center flex-col py-12 px-4">
+        <h1 className="text-4xl font-bold mb-4 text-black text-center">
+          Simplify Your Military Retirement Planning
+        </h1>
+        <p className="text-gray-600 mb-8">
+          Easily calculate your funds in minutes, think ahead.
+        </p>
+        
+   
+
+        <AnimatePresence mode="wait">
+          {currentStep === 'intro' ? (
+            <motion.div
+              key="intro"
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={pageTransition}
+              className="text-center mb-12"
+            >
+              <div className="flex items-center flex-col justify-center gap-4">
+                <input
+                  type="text"
+                  placeholder="Have your details ready"
+                  className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+                <button
+                  onClick={() => setCurrentStep('branch-selection')}
+                  className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  Start
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            renderStepContent()
+          )}
+        </AnimatePresence>
+
+
+             {/* Hero Image */}
+             {currentStep === 'intro' && (
+             <div className="mb-12 w-full max-w-3xl">
+          <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+            <img
+              src="/MilitaryHero.png"
+              alt="Military retirement planning"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.src = 'https://via.placeholder.com/800x400?text=Military+Retirement+Planning';
+              }}
+            />
+          </div>
+        </div>
+      )}
+      </div>
+
+      {/* Login Modal */}
+      {showLogin && <LoginModal />}
     </div>
   );
 } 
